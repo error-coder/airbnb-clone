@@ -7,9 +7,9 @@ class RoomAdmin(admin.ModelAdmin):
         "name",
         "price",
         "kind",
+        "total_amenities",
         "owner",
         "created_at",
-        "updated_at",
     )
 
     list_filter = (
@@ -19,8 +19,8 @@ class RoomAdmin(admin.ModelAdmin):
         "kind",
         "amenities",
         "created_at",
-        "updated_at",
     )
+
 
 @admin.register(Amenity)
 class AmenityAdmin(admin.ModelAdmin):
