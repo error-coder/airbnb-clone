@@ -8,17 +8,17 @@ class Experience(CommonModel):
     country = models.CharField(max_length=50, default="한국",)
     city = models.CharField(max_length=80, default="서울",)
     name = models.CharField(max_length=250,)
-    host = models.ForeignKey("users.User", on_delete=models.CASCADE,)
+    host = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="experiences",)
     price = models.PositiveIntegerField()
     address = models.CharField(max_length=250,)
     start = models.DateTimeField()
     end = models.DateTimeField()
     description = models.TextField()
-    perks = models.ManyToManyField("experiences.Perk",)
+    perks = models.ManyToManyField("experiences.Perk", related_name="experiences",)
 
     # cascade는 카테고리가 삭제되면 이 experiences도 삭제된다는걸 말함
     # SET_NULL은 categories의 category가 삭제되면 experiences의 카테고리를 null로 만듦
-    category = models.ForeignKey("categories.Category", null=True, blank=True, on_delete=models.SET_NULL,)
+    category = models.ForeignKey("categories.Category", null=True, blank=True, on_delete=models.SET_NULL, related_name="experiences",)
 
 
     def __str__(self) -> str:
