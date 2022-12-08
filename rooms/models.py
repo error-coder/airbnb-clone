@@ -32,6 +32,19 @@ class Room(CommonModel):
     def total_amenities(room):
         return room.amenities.count()
 
+    def rating(room):
+        count = room.reviews.count() # reviews -> related_name --> review 모델에서 room을 가리키는 foreign key에 부여함
+        if count == 0:
+            return "No Reviews"
+        else:
+            total_rating = 0
+            print(room.reviews.all().values("rating"))
+            print(room.reviews.all())
+            for review in room.reviews.all().values("rating"):
+                total_rating += review['rating']
+            return round(total_rating / count, 2)
+
+
 class Amenity(CommonModel):
 
     """Amenity Definition"""
