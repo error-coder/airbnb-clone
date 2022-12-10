@@ -14,7 +14,8 @@ def categories(request):
     elif request.method == "POST":
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
-            return Response({'created' : True})
+            new_category = serializer.save() # serializer 안에 있던 검증된 데이터로 create 메서드를 호출함
+            return Response(CategorySerializer(new_category).data)
         else:
             return Response(serializer.errors)
 
