@@ -15,3 +15,9 @@ class CategorySerializer(serializers.Serializer):
         # **는 딕셔너리를 가져옴
         # name = 'Category from DRF'
         # kind - 'rooms'로 자동으로 바꿔줌
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.kind = validated_data.get('kind', instance.kind)
+        instance.save() 
+        return instance

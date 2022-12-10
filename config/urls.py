@@ -18,6 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("rooms/", include("rooms.urls")),
-    path("categories/", include("categories.urls")),
+    path("api/v3/rooms/", include("rooms.urls")),
+    path("api/v3/categories/", include("categories.urls")), # api를 나타내는 새로운 url 이름을 지어줌(버전까지 나타내주는 것도 중요)
 ]
