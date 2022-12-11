@@ -1,19 +1,53 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from .models import Room
+from rest_framework.views import APIView
+from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
+from .models import Amenity
+from .serializers import AmenitySerializer
 
-# 모든 정보는 request에 들어있고 url에 요청을 보내고있는 유저의 정보도 자동으로 request objects안에 넣어줌
-def see_all_rooms(request):
-    rooms = Room.objects.all()
-    # 딕셔너리를 만들어 key와 value로 어떤 것이든 넘겨줄 수 있음
-    return render(request, "all_rooms.html", {'rooms': rooms, "title" : "Hello! this tilte comes from the django!",},)
+class Amenities(APIView):
 
-def see_one_room(request, room_pk):
-    try:
-        room = Room.objects.get(pk=room_pk)
-        return render(request, "room_detail.html", {'room': room,},)
-    except Room.DoesNotExist:
-        return render(request, "room_detail.html", {"not_found" : True,},)
+    def get(self, request):
+        all_amenities = Amenity.objects.all()
+        serializer = AmenitySerializer(all_amenities, many=True)
+        return Response(serializer.data)
 
-# 방이 존재하지 않으면 room_detail을 렌더링 하는데 not_found:True라는 변수를 넘겨줌
-# not_found가 False라면, room_detail에 있는 정보들을 보여줌, not_found가 True면 404를 보여줌
+    def post(self, request):
+        # 사용자의 데이터로 serializer를 만들 때는 serializer는 사용자의 데이터가 amenity object가 원하는 데이터에 준수하는지 검증해야 함
+        serializer = AmenitySerializer(data=request.data)
+        if serializer.is_valid():
+            # True일 경우 serializer.save를 해서 ModelSerializer가 자동으로 amenity를 만들게 해야함
+            amenity = serializer.save()
+            # 새로 만들어진 것을 serialize한 다음 리턴해줌
+            return Response(AmenitySerializer(amenity).data,)
+        else:
+            return Response(serializer.errors)
+
+class AmenityDetail(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Amenity.objects.get(pk=pk)
+        except Amenity.DoesNotExist:
+            raise NotFound
+
+
+    def get(self, request, pk):
+        amenity = self.get_object(pk)
+        serializer = AmenitySerializer(amenity)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        amenity = self.get_object(pk)
+        # partial은 부분 업데이트로 name 또는 description을 변경할 수 있음(둘 다X, 둘 중에 하나)
+        serializer = AmenitySerializer(amenity, data=request.data, partial=True,)
+        if serializer.is_valid():
+            updated_amenity = serializer.save()
+            return Response(AmenitySerializer(updated_amenity).data,)
+        else:
+            return Response(serializer.errors)
+
+    def delete(self, request, pk):
+        amenity = self.get_object(pk)
+        amenity.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
