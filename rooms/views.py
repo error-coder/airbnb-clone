@@ -1,10 +1,12 @@
 from rest_framework.views import APIView
+from django.db import transaction
 from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
+from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError, PermissionDenied
 from .models import Amenity, Room
 from categories.models import Category
 from .serializers import AmenitySerializer, RoomListSerializer, RoomDetailSerializer
+from reviews.serializers import ReviewSerializer
 
 class Amenities(APIView):
 
@@ -58,7 +60,7 @@ class Rooms(APIView):
 
     def get(self, request):
         all_rooms = Room.objects.all()
-        serializer = RoomListSerializer(all_rooms, many=True)
+        serializer = RoomListSerializer(all_rooms, many=True, context={"request" : request},)
         return Response(serializer.data)
 
     def post(self, request):
@@ -74,16 +76,20 @@ class Rooms(APIView):
                         raise ParseError("The category kind should be 'rooms'.")
                 except Category.DoesNotExist:
                     raise ParseError("Category not found")
-                room = serializer.save(owner=request.user, category=category,) # owner=request.user는 자동으로 owner를 방에 추가해줌 
-                amenities = request.data.get("amenities")
-                for amentiy_pk in amenities:
-                    try:
-                        amenity = Amenity.objects.get(pk=amentiy_pk)
-                    except Amenity.DoesNotExist:
-                        raise ParseError(f"Amenity with id {amentiy_pk} not found")
-                    room.amenities.add(amenity)
-                serializer = RoomDetailSerializer(room)
-                return Response(serializer.data)
+                try:
+                    with transaction.atomic():
+                        room = serializer.save(
+                            owner=request.user,
+                            category=category,
+                        )
+                        amenities = request.data.get("amenities")
+                        for amenity_pk in amenities:
+                            amenity = Amenity.objects.get(pk=amenity_pk)
+                            room.amenities.add(amenity)
+                        serializer = RoomDetailSerializer(room)
+                        return Response(serializer.data)
+                except Exception:
+                    raise ParseError("Amenity not found")
             else:
                 return Response(serializer.errors)
         else:
@@ -100,5 +106,95 @@ class RoomDetail(APIView):
 
     def get(self, request, pk):
         room = self.get_object(pk)
-        serializer = RoomDetailSerializer(room)
+        serializer = RoomDetailSerializer(room, context={"request" : request},)
         return Response(serializer.data)
+
+    def put(self, request, pk):
+        room = self.get_object(pk)
+        if not request.user.is_authenticated:
+            raise NotAuthenticated
+        if room.owner != request.user:
+            raise PermissionDenied
+        serializer = RoomDetailSerializer(room, data=request.data, partial=True,)
+        if serializer.is_valid():
+            category_pk = request.data.get("category")
+            try:
+                with transaction.atomic():
+                    new_room = serializer.save()
+                    if category_pk:
+                        category = Category.objects.get(pk=category_pk)
+                        if category.kind != Category.CategoryKindChoices.ROOM:
+                            raise ParseError("The category kind should be rooms")
+                        updated_room = serializer.save(category=category)
+                    else:
+                        updated_room = serializer.save()
+
+                    amenities = request.data.get("amenities")
+                    if amenities:
+                        updated_room.amenities.clear()
+                        for amenity_pk in amenities:
+                            amenity = Amenity.objects.get(pk=amenity_pk)
+                        new_room.amenities.add(amenity)
+                        serializer = RoomDetailSerializer(new_room)
+                        return Response(serializer.data)
+            except Exception:
+                    raise ParseError("Amenity not Found")
+            else:
+                return Response(serializer.errors)
+        else:
+            raise NotAuthenticated
+
+    def delete(self, request, pk):
+        room = self.get_object(pk)
+        if not request.user.is_authenticated:
+            raise NotAuthenticated
+        if room.owner != request.user:
+            raise PermissionDenied
+        room.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
+
+class RoomReviews(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        try:
+            page = request.query_params.get("page", 1) # 페이지가 url에 있지 않다면 기본값으로 페이지 1을 요청함
+            page = int(page) # 페이지가 url에 있고 숫자로 되어 있다면 문자열을 실제 숫자 타입으로 바꿔야 함, 페이지가 그냥 문자라면 함수는 작동 안함
+        except ValueError:
+            page = 1 # url에 페이지가 없거나 유저가 잘못된 페이지를 보내는 상황이어도 페이지는 1이 됨
+        page_size = 3
+        start = (page - 1) * page_size
+        end = start + page_size
+        room = self.get_object(pk)
+        serializer = ReviewSerializer(room.reviews.all()[start:end], many=True,) # 처음부터 모든 리뷰를 업로드 후 자르는 방식이 아닌, 시작과 끝 지점을 갖고 가서 db에서 살펴보는 방식
+        return Response(serializer.data)
+
+# rooms/id/amenities를 pagenation 하여 만들어보기
+
+class RoomAmenities(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        try:
+            page = request.query_params.get("page", 1)
+            page = int(page)
+        except ValueError:
+            page = 1
+
+        page_size = 3
+        start = (page - 1) * page_size
+        end = start + page_size
+        room = self.get_object(pk)
+        serializer = ReviewSerializer(room.reviews.all()[start:end], many=True,) # 처음부터 모든 리뷰를 업로드 후 자르는 방식이 아닌, 시작과 끝 지점을 갖고 가서 db에서 살펴보는 방식
+        return Response(serializer.data)
+
