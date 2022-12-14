@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.views import APIView
 from django.db import transaction
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -191,10 +192,15 @@ class RoomAmenities(APIView):
         except ValueError:
             page = 1
 
-        page_size = 3
+        page_size = settings.PAGE_SIZE
         start = (page - 1) * page_size
         end = start + page_size
         room = self.get_object(pk)
         serializer = ReviewSerializer(room.reviews.all()[start:end], many=True,) # 처음부터 모든 리뷰를 업로드 후 자르는 방식이 아닌, 시작과 끝 지점을 갖고 가서 db에서 살펴보는 방식
         return Response(serializer.data)
 
+
+class RoomPhothos(APIView):
+
+    def post(self, request, pk):
+        pass

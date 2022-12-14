@@ -158,3 +158,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Auth
 
 AUTH_USER_MODEL = "users.User"
+
+MEDIA_ROOT = "uploads" # 파일이 실제 있는 폴더
+
+MEIDA_URL = "user-uploads/" # 브라우저가 파일을 찾아가는 방법
+
+PAGE_SIZE = 3

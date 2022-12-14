@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v3/rooms/", include("rooms.urls")),
     path("api/v3/categories/", include("categories.urls")), # api를 나타내는 새로운 url 이름을 지어줌(버전까지 나타내주는 것도 중요)
     path("api/v3/experiences/", include("experiences.urls")),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
