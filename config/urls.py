@@ -24,4 +24,5 @@ urlpatterns = [
     path("api/v3/categories/", include("categories.urls")), # api를 나타내는 새로운 url 이름을 지어줌(버전까지 나타내주는 것도 중요)
     path("api/v3/experiences/", include("experiences.urls")),
     path("api/v3/medias/", include("medias.urls")),
+    path("api/v3/wishlists/", include("wishlists.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
