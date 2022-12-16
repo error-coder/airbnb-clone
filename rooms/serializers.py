@@ -5,6 +5,7 @@ from users.serializers import TinyUserSerializer
 from reviews.serializers import ReviewSerializer
 from categories.serializers import CategorySerializer
 from medias.serializers import PhotoSerializer
+from wishlists.models import Wishlist
 
 class AmenitySerializer(ModelSerializer):
     class Meta:
@@ -20,6 +21,7 @@ class RoomDetailSerializer(ModelSerializer):
     category = CategorySerializer(read_only=True) # array가 아니고 숫자 하나면 many=True를 사용X
     rating = serializers.SerializerMethodField() # potato의 값을 계산할 method를 만들라고함
     is_owner = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
     photos = PhotoSerializer(many=True, read_only=True)
 
     class Meta:
@@ -33,6 +35,10 @@ class RoomDetailSerializer(ModelSerializer):
     def get_is_owner(self, room):
         request = self.context['request']
         return room.owner == request.user
+
+    def get_is_liked(self, room):
+        request = self.context['request']
+        return Wishlist.objects.filter(user=request.user, rooms__pk=room.pk).exists() # 유저가 여러 개의 wishlist를 가질 수 있기 때문에 filter 사용
 
 class RoomListSerializer(ModelSerializer):
 
