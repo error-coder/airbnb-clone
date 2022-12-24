@@ -165,3 +165,11 @@ MEDIA_ROOT = "uploads" # 파일이 실제 있는 폴더
 MEIDA_URL = "user-uploads/" # 브라우저가 파일을 찾아가는 방법
 
 PAGE_SIZE = 3
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework.authentication.SessionAuthentication', # SessionAuthentication이 쿠키랑 세션을 보고 유저를 찾음
+        "config.authentication.TrustMeBroAuthentication",
+    ]
+}
