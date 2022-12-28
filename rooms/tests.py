@@ -1,5 +1,6 @@
 from rest_framework.test import APITestCase
 from . import models
+from users.models import User
 
 
 class TestAmenities(APITestCase):
@@ -98,3 +99,28 @@ class TestAmenity(APITestCase):
         response = self.client.delete("/api/v3/rooms/amenities/1")
 
         self.assertEqual(response.status_code, 204)
+
+
+
+class TestRooms(APITestCase):
+
+    def setUp(self):
+        user = User.objects.create(username="test",)
+        user.set_password("123")
+        user.save()
+        self.user = user
+
+    def test_create_room(self): # 처음엔 아무 유저도 없음 - 유저를 생성해줘야 함
+
+        response = self.client.post("/api/v3/rooms/")
+
+        self.assertEqual(response.status_code, 403)
+
+        self.client.force_login(self.user,) # force_login은 유저만 있으면 됨(username과 비밀번호는 필요X)
+
+        response = self.client.post("/api/v3/rooms/")
+        print(response.json())
+
+# Test Authentication 작동 원리
+# setup에서 유저를 생성하고 비밀번호 지정 후 유저를 저장함
+# 유저를 class 내부에 저장하고 class안에 있는 method에 접근가능하게 함
