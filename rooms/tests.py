@@ -119,7 +119,6 @@ class TestRooms(APITestCase):
         self.client.force_login(self.user,) # force_login은 유저만 있으면 됨(username과 비밀번호는 필요X)
 
         response = self.client.post("/api/v3/rooms/")
-        print(response.json())
 
 # Test Authentication 작동 원리
 # setup에서 유저를 생성하고 비밀번호 지정 후 유저를 저장함
