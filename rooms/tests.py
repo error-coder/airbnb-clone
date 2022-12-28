@@ -98,11 +98,3 @@ class TestAmenity(APITestCase):
         response = self.client.delete("/api/v3/rooms/amenities/1")
 
         self.assertEqual(response.status_code, 204)
-
-
-class TestRooms(APITestCase):
-
-    def test_create_room(self):
-
-        response = self.client.post("/api/v3/rooms/")
-        print(response)
