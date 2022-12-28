@@ -48,3 +48,61 @@ class TestAmenities(APITestCase):
         self.assertIn("name", data)
 
 
+class TestAmenity(APITestCase):
+
+    NAME = "Test Amenity"
+    DESC = "Test Dsc"
+
+    def setUp(self):
+        models.Amenity.objects.create(name=self.NAME, description=self.DESC,)
+
+    def test_amenity_not_found(self):
+        response = self.client.get("/api/v3/rooms/amenities/2") # 첫 번째는 URL이 존재하지 않을 경우를 테스트
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_amenity(self):
+
+        response = self.client.get("/api/v3/rooms/amenities/1")
+
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+
+        self.assertEqual(data["name"], self.NAME,)
+        self.assertEqual(data["description"], self.DESC,)
+
+    def test_put_amenity(self):
+        
+        put_amenity_name = "Put Amenity"
+        put_amenity_description = "Put Amenity Dsc"
+
+        response = self.client.put("/api/v3/rooms/amenities/1", {"name" : put_amenity_name, "description" : put_amenity_description,},)
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200, "Not 200 Status Code.")
+        self.assertEqual(data["name"], put_amenity_name,)
+        self.assertEqual(data["description"], put_amenity_description,)
+        
+        response = self.client.put("/api/v3/rooms/amenities/1")
+        data = response.json()
+
+        self.assertIn("name", data)
+
+        # put은 코드챌린지
+        # serializer가 유효해서 유저가 Amenity 업데이트를 할 수 있는 경우, 유효하지 않을 때
+
+
+    def test_delete_amenity(self):
+        
+        response = self.client.delete("/api/v3/rooms/amenities/1")
+
+        self.assertEqual(response.status_code, 204)
+
+
+class TestRooms(APITestCase):
+
+    def test_create_room(self):
+
+        response = self.client.post("/api/v3/rooms/")
+        print(response)
