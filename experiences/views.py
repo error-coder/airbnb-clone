@@ -13,6 +13,7 @@ from .models import Perk, Experience
 from . import serializers
 
 class Experiences(APIView):
+
     def get(self, request):
         experiences = Experience.objects.all()
         serializer = serializers.ExperienceSerializer(experiences, many=True,)
@@ -32,7 +33,7 @@ class Experiences(APIView):
                 if category.kind == Category.CategoryKindChoices.ROOMS:
                     raise ParseError("The category kind should be experiences")
             except Category.DoesNotExist:
-                raise ParseError("Category not found")
+                raise ParseError(detail="Category not found")
 
             try:
                 with transaction.atomic():
@@ -81,7 +82,7 @@ class ExperienceDetail(APIView):
                     if category.kind == Category.CategoryKindChoices.ROOMS:
                         raise ParseError("The category kind should be experience")
                 except Category.DoesNotExist:
-                    raise ParseError("category not found")
+                    raise ParseError(detail="category not found")
 
             try:
                 with transaction.atomic():
@@ -257,3 +258,8 @@ class PerkDetail(APIView):
             return Response(serializers.PerkSerializer(updated_perk).data)
         else:
             return Response(serializer.errors)
+
+    def delete(self, request, pk):
+        perk = self.get_object(pk)
+        perk.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
