@@ -13,7 +13,7 @@ class Photo(CommonModel):
 
 class Video(CommonModel):
 
-    file = models.URLField() # 파일은 장고에서 손대지 않을 거기 때문에 url필드로 수정함
+    file = models.URLField()
     experience = models.OneToOneField("experiences.Experience", on_delete=models.CASCADE, related_name="videos",) # 한 개의 활동이 여러 동영상을 가질 수 없음
 
     def __str__(self):

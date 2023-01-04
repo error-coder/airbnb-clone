@@ -1,6 +1,6 @@
 from . import models
 
-def get_all_rooms(): # Information으로 user가 authenticated인지 아닌지 알 수 있음
+def get_all_rooms():
         return models.Room.objects.all()
     
 

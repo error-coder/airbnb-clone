@@ -23,8 +23,8 @@ class Room(CommonModel):
     owner = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="rooms",)
     amenities = models.ManyToManyField("rooms.Amenity", related_name="rooms",)
     category = models.ForeignKey("categories.Category", null=True, blank=True, on_delete=models.SET_NULL, related_name="rooms",)
-    created_at = models.DateTimeField(auto_now_add=True) # auto_now_add는 필드의 값을 해당 object가 처음 생성되었을 때 시간으로 설정함 -> room이 만들어지면 django는 이 방이 만들어진 date를 이 부분에 넣음
-    updated_at = models.DateTimeField(auto_now=True) # auto_now는 저장될 때마다 해당 필드를 현재 date로 설정함
+    created_at = models.DateTimeField(auto_now_add=True) 
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(room) -> str:
         return room.name
@@ -33,7 +33,7 @@ class Room(CommonModel):
         return room.amenities.count()
 
     def rating(room):
-        count = room.reviews.count() # reviews -> related_name --> review 모델에서 room을 가리키는 foreign key에 부여함
+        count = room.reviews.count()
         if count == 0:
             return 0
         else:

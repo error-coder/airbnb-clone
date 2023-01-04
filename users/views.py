@@ -11,7 +11,7 @@ from . import serializers
 
 class Me(APIView):
 
-    permission_classes = [IsAuthenticated] # /me가 로그인한 user의 정보는 private 해야 하기 때문
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -40,8 +40,7 @@ class Users(APIView):
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(password)
-            user.save() # hash화된 비밀번호가 필요하기 때문
-            # user.password = password(X) - 절대 X
+            user.save() 
             serializer = serializers.PrivateUserSerializer(user)
             return Response(serializer.data)
         else:
@@ -69,7 +68,7 @@ class ChangePassword(APIView):
         if not old_password or not new_password:
             raise ParseError
         if user.check_password(old_password):
-            user.set_password(new_password) # new_password를 hash할 때만 작동
+            user.set_password(new_password)
             user.save()
             return Response(status=status.HTTP_200_OK)
         else:

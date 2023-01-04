@@ -9,7 +9,5 @@ from .serializers import CategorySerializer
 
 
 class CategoryViewSet(ModelViewSet):
-    # Viewset은 두 가지를 알아야함
-    # serializer가 뭔지 알아야 하고 Viewset의 object가 뭔지 알아야함, 사용하기에 좋지는 않음
     serializer_class = CategorySerializer
     queryset = Category.objects.all()

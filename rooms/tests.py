@@ -12,9 +12,9 @@ class TestAmenities(APITestCase):
     def setUp(self):
         models.Amenity.objects.create(name=self.NAME, description=self.DESC,)
 
-    def test_all_amenities(self): # test_로 시작하지 않으면 django는 코드를 실행하지 않음
+    def test_all_amenities(self):
 
-        response = self.client.get(self.URL) # self.client는 api로 get/post/put/delete request를 보낼 수 있게함
+        response = self.client.get(self.URL)
         data = response.json()
 
         self.assertEqual(response.status_code, 200, "Status code isn't 200",)
@@ -23,12 +23,6 @@ class TestAmenities(APITestCase):
         self.assertEqual(data[0]["name"], self.NAME,)
         self.assertEqual(data[0]["description"], self.DESC,)
         
-        # <작동 원리>
-        # 첫번째로 테스트할 것은 누구든 url로 갈 수 있어야 하고 공개되어 있어야 함
-        # 테스트 시작 전에 NAME, DESC 값들을 넣어서 Amenity를 하나 생성함
-        # 그 다음 URL로 가서 Amenity들을 요청함
-        # 응답코드가 200인지 확인, data가 list인지 확인, data의 길이가 1인지 확인함(Amenity를 하나 생성했기 때문)
-        # data 첫번째 아이템의 name이 self.NAME이랑 같은지 확인, description도 확인
 
     def test_create_amenity(self):
 
@@ -58,7 +52,7 @@ class TestAmenity(APITestCase):
         models.Amenity.objects.create(name=self.NAME, description=self.DESC,)
 
     def test_amenity_not_found(self):
-        response = self.client.get("/api/v3/rooms/amenities/2") # 첫 번째는 URL이 존재하지 않을 경우를 테스트
+        response = self.client.get("/api/v3/rooms/amenities/2") 
 
         self.assertEqual(response.status_code, 404)
 
@@ -90,9 +84,6 @@ class TestAmenity(APITestCase):
 
         self.assertIn("name", data)
 
-        # put은 코드챌린지
-        # serializer가 유효해서 유저가 Amenity 업데이트를 할 수 있는 경우, 유효하지 않을 때
-
 
     def test_delete_amenity(self):
         
@@ -110,16 +101,12 @@ class TestRooms(APITestCase):
         user.save()
         self.user = user
 
-    def test_create_room(self): # 처음엔 아무 유저도 없음 - 유저를 생성해줘야 함
+    def test_create_room(self):
 
         response = self.client.post("/api/v3/rooms/")
 
         self.assertEqual(response.status_code, 403)
 
-        self.client.force_login(self.user,) # force_login은 유저만 있으면 됨(username과 비밀번호는 필요X)
+        self.client.force_login(self.user,)
 
         response = self.client.post("/api/v3/rooms/")
-
-# Test Authentication 작동 원리
-# setup에서 유저를 생성하고 비밀번호 지정 후 유저를 저장함
-# 유저를 class 내부에 저장하고 class안에 있는 method에 접근가능하게 함

@@ -2,11 +2,8 @@ import strawberry
 from rooms import schema as rooms_schema
 
 
-# typing은 코드에 주석을 추가할 수 있게 해줌
-
-
 @strawberry.type
-class Query(rooms_schema.Query): # Query가 rooms_schema.Query 상속함
+class Query(rooms_schema.Query):
     pass
 
 @strawberry.type

@@ -15,7 +15,7 @@ class Booking(CommonModel):
     room = models.ForeignKey("rooms.Room",null=True, blank=True ,on_delete=models.SET_NULL, related_name="bookings",)
     experience = models.ForeignKey("experiences.Experience",null=True, blank=True, on_delete=models.SET_NULL, related_name="bookings",)
     check_in = models.DateField(null=True, blank=True,)
-    check_out = models.DateField(null=True, blank=True,) # null, blank를 True로 하는 것은 사용될 때도 있고 사용 안될때도 있기 때문
+    check_out = models.DateField(null=True, blank=True,)
     experience_time = models.DateTimeField(null=True, blank=True,)
     guests = models.PositiveIntegerField()
 
