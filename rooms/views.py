@@ -221,6 +221,8 @@ class RoomPhotos(APIView):
 
     def post(self, request, pk):
         room = self.get_object(pk)
+        if not request.user != room.owner:
+            raise NotAuthenticated
         if request.user != room.owner:
             raise PermissionDenied
         serializer = PhotoSerializer(data=request.data)
