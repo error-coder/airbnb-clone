@@ -1,4 +1,5 @@
 import jwt
+import requests
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
@@ -114,3 +115,10 @@ class JWTLogin(APIView):
             return Response({'token':token})
         else:
             return Response({"error" : "wrong password"})
+
+
+class GithubLogIn(APIView):
+
+    def post(self, request):
+        code = request.data.get("code")
+        
