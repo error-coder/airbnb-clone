@@ -40,7 +40,6 @@ THIRD_PARTY_APPS = [
     'rest_framework.authtoken',
     "strawberry.django",
     "corsheaders",
-    "django-environ",
 ]
 
 CUSTOM_APPS = [ 
