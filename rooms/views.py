@@ -122,7 +122,7 @@ class RoomDetail(APIView):
             category_pk = request.data.get("category")
             try:
                 with transaction.atomic():
-                    new_room = serializer.save()
+                    room = serializer.save()
                     if category_pk:
                         category = Category.objects.get(pk=category_pk)
                         if category.kind != Category.CategoryKindChoices.ROOM:
@@ -136,8 +136,8 @@ class RoomDetail(APIView):
                         updated_room.amenities.clear()
                         for amenity_pk in amenities:
                             amenity = Amenity.objects.get(pk=amenity_pk)
-                        new_room.amenities.add(amenity)
-                        serializer = serializers.RoomDetailSerializer(new_room)
+                        room.amenities.add(amenity)
+                        serializer = serializers.RoomDetailSerializer(room, context={"request": request},)
                         return Response(serializer.data)
             except Exception:
                     raise ParseError("Amenity not Found")
