@@ -35,4 +35,4 @@ class GetUploadURL(APIView):
         one_time_url = requests.post(url, headeres={"Authorization": f"Bearer {settings.CF_TOKEN}",},)
         one_time_url = one_time_url.json()
         result = one_time_url.get('result')
-        return Response({"id" : result.get("id"), "uploadURL" : result.get('uploadURL'),},)
+        return Response({"id" : result.get("id"), "uploadURL" : result.get('uploadURL')})

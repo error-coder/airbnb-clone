@@ -139,7 +139,7 @@ class RoomDetail(APIView):
                         room.amenities.add(amenity)
                         serializer = serializers.RoomDetailSerializer(room, context={"request": request},)
                         return Response(serializer.data)
-            except Exception:
+            except Exception as e:
                     raise ParseError("Amenity not Found")
             else:
                 return Response(serializer.errors)
