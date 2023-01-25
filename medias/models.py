@@ -14,7 +14,7 @@ class Photo(CommonModel):
 class Video(CommonModel):
 
     file = models.URLField()
-    experience = models.OneToOneField("experiences.Experience", on_delete=models.CASCADE, related_name="videos",) # 한 개의 활동이 여러 동영상을 가질 수 없음
+    experience = models.OneToOneField("experiences.Experience", on_delete=models.CASCADE, related_name="videos",)
 
     def __str__(self):
         return "Video File"

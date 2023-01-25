@@ -54,7 +54,7 @@ class PublicUser(APIView):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise NotFound
-        serializer = serializers.PrivateUserSerializer()
+        serializer = serializers.PrivateUserSerializer(user)
         return Response(serializer.data)
 
 
@@ -73,12 +73,10 @@ class ChangePassword(APIView):
             user.save()
             return Response(status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return ParseError
 
 
 class LogIn(APIView):
-
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         username = request.data.get("username")
@@ -86,6 +84,7 @@ class LogIn(APIView):
         if not username or not password:
             raise ParseError
         user = authenticate(request, username=username, password=password,)
+
         if user:
             login(request, user)
             return Response({"ok" : "Welcome!"})
@@ -157,7 +156,7 @@ class KakaoLogIn(APIView):
             user_data = requests.get("https://kapi.kakao.com/v2/user/me", headers={
                 "Authorization":f"Bearer {access_token}",
                 "Content-type":"application/x-www-form-urlencoded;charset=utf-8",
-            })
+            },)
             user_data = user_data.json()
             kakao_account = user_data.get("kakao_account")
             profile = kakao_account.get("profile")
