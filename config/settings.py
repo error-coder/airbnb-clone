@@ -157,25 +157,25 @@ AUTH_USER_MODEL = "users.User"
 
 MEDIA_ROOT = "uploads" # 파일이 실제 있는 폴더
 
-MEIDA_URL = "user-uploads/" # 브라우저가 파일을 찾아가는 방법
+MEDIA_URL = "user-uploads/" # 브라우저가 파일을 찾아가는 방법
 
-PAGE_SIZE = 3
+PAGE_SIZE = 5
 
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework.authentication.SessionAuthentication', # SessionAuthentication이 쿠키랑 세션을 보고 유저를 찾음
-        "config.authentication.TrustMeBroAuthentication",
         "rest_framework.authentication.TokenAuthentication",
         "config.authentication.JWTAuthentication",
     ]
 }
 
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]
+if DEBUG:
+    CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]
+    CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
 
 GH_SECRET = env("GH_SECRET")
 

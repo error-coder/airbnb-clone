@@ -16,7 +16,7 @@ class Experiences(APIView):
 
     def get(self, request):
         experiences = Experience.objects.all()
-        serializer = serializers.ExperienceSerializer(experiences, many=True,)
+        serializer = serializers.ExperienceSerializer(experiences, many=True)
 
         return Response(serializer.data)
 
@@ -71,7 +71,7 @@ class ExperienceDetail(APIView):
         if experience.host != request.user:
             raise PermissionDenied
 
-        serializer = serializers.ExperienceSerializer(experience, data=request.data, partial=True,)
+        serializer = serializers.ExperienceSerializer(experience, data=request.data, partial=True)
 
         if serializer.is_valid():
             category_pk = request.data.get("category")
@@ -139,9 +139,9 @@ class ExperienceBookings(APIView):
 
     def get_object(self, pk):
         try:
-            return Experiences.objects.get(pk=pk)
-        except Experiences.DoesNotExist:
-            NotFound
+            return Experience.objects.get(pk=pk)
+        except Experience.DoesNotExist:
+            raise NotFound
 
     def get(self, request, pk):
         try:
@@ -197,7 +197,7 @@ class ExperienceBookingDetail(APIView):
         if booking.user.pk != request.user.pk:
             raise PermissionDenied
 
-        serializer = CreateExperienceBookingSerializer(booking, data=request.data, partial=True,)
+        serializer = CreateExperienceBookingSerializer(booking, data=request.data, partial=True)
 
         if serializer.is_valid():
             booking = serializer.save()
@@ -251,7 +251,7 @@ class PerkDetail(APIView):
 
     def put(self, request, pk):
         perk = self.get_object(pk)
-        serializer = serializers.PerkSerializer(perk, data=request.data, partial=True,)
+        serializer = serializers.PerkSerializer(perk, data=request.data, partial=True)
         
         if serializer.is_valid():
             updated_perk = serializer.save()

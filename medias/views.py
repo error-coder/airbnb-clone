@@ -21,7 +21,6 @@ class PhotoDetail(APIView):
 
     def delete(self, request, pk):
         photo = self.get_object(pk)
-
         if (photo.room and photo.room.owner != request.user) or (photo.experience and photo.experience.host != request.user):
             raise PermissionDenied
         photo.delete()
@@ -32,7 +31,7 @@ class GetUploadURL(APIView):
 
     def post(self, request):
         url = f"https://api.cloudflare.com/client/v4/accounts/{settings.CF_ID}/images/v2/direct_upload"
-        one_time_url = requests.post(url, headeres={"Authorization": f"Bearer {settings.CF_TOKEN}",},)
+        one_time_url = requests.post(url, headers={"Authorization": f"Bearer {settings.CF_TOKEN}",})
         one_time_url = one_time_url.json()
         result = one_time_url.get('result')
         return Response({"id" : result.get("id"), "uploadURL" : result.get('uploadURL')})

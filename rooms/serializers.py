@@ -28,7 +28,6 @@ class RoomDetailSerializer(ModelSerializer):
         fields = "__all__"
 
     def get_rating(self, room): 
-        print(self.context)
         return room.rating()
 
     def get_is_owner(self, room):

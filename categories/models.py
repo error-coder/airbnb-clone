@@ -12,8 +12,8 @@ class Category(CommonModel):
     name = models.CharField(max_length=50,)
     kind = models.CharField(max_length=15, choices=CategoryKindChoices.choices,)
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return f"{self.kind.title()}: {self.name}"
 
     class Meta:
         verbose_name_plural = "Categories"

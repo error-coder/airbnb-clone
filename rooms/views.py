@@ -233,6 +233,9 @@ class RoomPhotos(APIView):
         else:
             return Response(serializer.errors)
 
+    def delete(self, request, pk):
+        pass
+
 class RoomBookings(APIView):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
