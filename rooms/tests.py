@@ -9,7 +9,7 @@ class TestAmenities(APITestCase):
     DESC="Amenity Desc"
     URL = "/api/v3/rooms/amenities/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         models.Amenity.objects.create(name=self.NAME, description=self.DESC,)
 
     def test_all_amenities(self):
@@ -17,11 +17,11 @@ class TestAmenities(APITestCase):
         response = self.client.get(self.URL)
         data = response.json()
 
-        self.assertEqual(response.status_code, 200, "Status code isn't 200",)
-        self.assertIsInstance(data, list,)
-        self.assertEqual(len(data), 1,)
-        self.assertEqual(data[0]["name"], self.NAME,)
-        self.assertEqual(data[0]["description"], self.DESC,)
+        self.assertEqual(response.status_code, 200, "Status code isn't 200")
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["name"], self.NAME)
+        self.assertEqual(data[0]["description"], self.DESC)
         
 
     def test_create_amenity(self):
@@ -29,7 +29,7 @@ class TestAmenities(APITestCase):
         new_amenity_name = "New Amenity"
         new_amenity_description = "New Amenity desc."
 
-        response = self.client.post(self.URL, {"name" : new_amenity_name, "description" : new_amenity_description,},) 
+        response = self.client.post(self.URL, data={"name" : new_amenity_name, "description" : new_amenity_description,},) 
         data = response.json()
 
         self.assertEqual(response.status_code, 200, "Not 200 status code.",)

@@ -36,12 +36,13 @@ class Users(APIView):
     def post(self, request):
         password = request.data.get('password')
         if not password:
-            raise ParseError
+            ParseError("Enter the password")
         serializer = serializers.PrivateUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(password)
-            user.save() 
+            user.save()
+            login(request, user) 
             serializer = serializers.PrivateUserSerializer(user)
             return Response(serializer.data)
         else:
@@ -67,13 +68,14 @@ class ChangePassword(APIView):
         old_password = request.data.get("old_password")
         new_password = request.data.get("new_password")
         if not old_password or not new_password:
-            raise ParseError
+            raise ParseError()
+
         if user.check_password(old_password):
             user.set_password(new_password)
             user.save()
             return Response(status=status.HTTP_200_OK)
         else:
-            return ParseError
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class LogIn(APIView):
@@ -89,7 +91,7 @@ class LogIn(APIView):
             login(request, user)
             return Response({"ok" : "Welcome!"})
         else:
-            return Response({"error" : "wrong password"}, status=status.HTTP_400_BAD_REQUEST,)
+            return Response({"error" : "wrong password"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class LogOut(APIView):
@@ -123,9 +125,9 @@ class GithubLogIn(APIView):
             code = request.data.get("code")
             access_token = request.post(f"https://github.com/login/oauth/access_token?code={code}&client_id=7295d1136e095e687640&client_secret={settings.GH_SECRET}", headers={"Accept": "application/json"},)
             access_token = access_token.json().get('access_token')
-            user_data = requests.get("https://api.github.com/user", headers={"Authorization":f"Bearer {access_token}", "Accept" : "application/json",},)
+            user_data = requests.get("https://api.github.com/user", headers={"Authorization":f"Bearer {access_token}", "Accept" : "application/json",})
             user_data = user_data.json()
-            user_emails = requests.get("https://api.github.com/user/emails", headers={"Authorization":f"Bearer {access_token}", "Accept" : "application/json",},)
+            user_emails = requests.get("https://api.github.com/user/emails", headers={"Authorization":f"Bearer {access_token}", "Accept" : "application/json",})
             user_emails = user_emails.json()
             try:
                 user = User.objects.get(email=user_emails[0]['email'])

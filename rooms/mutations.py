@@ -19,7 +19,7 @@ def add_room(info:Info, category_pk:int, amenities : typing.List[int], name: str
         if category.kind == Category.CategoryKindChoices.EXPERIENCES:
             raise Exception("The category kind should be rooms")
     except Category.DoesNotExist:
-        raise Exception("Category not found")
+        raise Exception(detail="Category not found")
 
     try:
         with transaction.atomic():

@@ -2,11 +2,9 @@ import requests
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, PermissionDenied
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from .models import Photo
 
 class PhotoDetail(APIView):
@@ -24,7 +22,7 @@ class PhotoDetail(APIView):
         if (photo.room and photo.room.owner != request.user) or (photo.experience and photo.experience.host != request.user):
             raise PermissionDenied
         photo.delete()
-        return Response(status=HTTP_200_OK)
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class GetUploadURL(APIView):

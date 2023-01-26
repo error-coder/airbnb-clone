@@ -8,7 +8,7 @@ class Photo(CommonModel):
     room = models.ForeignKey("rooms.Room",null=True, blank=True, on_delete=models.CASCADE, related_name="photos",)
     experience = models.ForeignKey("experiences.Experience",null=True, blank=True, on_delete=models.CASCADE, related_name="photos",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Photo File"
 
 class Video(CommonModel):
@@ -16,5 +16,5 @@ class Video(CommonModel):
     file = models.URLField()
     experience = models.OneToOneField("experiences.Experience", on_delete=models.CASCADE, related_name="videos",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Video File"
