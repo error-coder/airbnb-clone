@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Review
 
+
 class RatingFilter(admin.SimpleListFilter):
 
     parameter_name = "input_rating"
@@ -24,6 +25,12 @@ class RatingFilter(admin.SimpleListFilter):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    
-    list_display = ("__str__", "payload",)
-    list_filter = ("rating",RatingFilter,)
+
+    list_display = (
+        "__str__",
+        "payload",
+    )
+    list_filter = (
+        "rating",
+        RatingFilter,
+    )

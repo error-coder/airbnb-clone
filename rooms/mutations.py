@@ -6,6 +6,7 @@ from enum import Enum
 from .models import Room, Amenity
 from categories.models import Category
 
+
 @strawberry.enum
 class RoomKindChoices(Enum):
     ENTIRE_PLACE = "entire_place"
@@ -13,7 +14,21 @@ class RoomKindChoices(Enum):
     SHARED_ROOM = "shared_room"
 
 
-def add_room(info:Info, category_pk:int, amenities : typing.List[int], name: str, country:str ,city:str, price:int, rooms:int ,toilets:int, description:str, address:str, pet_friendly:bool, kind:RoomKindChoices,):
+def add_room(
+    info: Info,
+    category_pk: int,
+    amenities: typing.List[int],
+    name: str,
+    country: str,
+    city: str,
+    price: int,
+    rooms: int,
+    toilets: int,
+    description: str,
+    address: str,
+    pet_friendly: bool,
+    kind: RoomKindChoices,
+):
     try:
         category = Category.objects.get(pk=category_pk)
         if category.kind == Category.CategoryKindChoices.EXPERIENCES:
@@ -23,8 +38,21 @@ def add_room(info:Info, category_pk:int, amenities : typing.List[int], name: str
 
     try:
         with transaction.atomic():
-            room = Room.objects.create(name=name, country=country, city=city, price=price, rooms=rooms, toilets=toilets, description=description, address=address, pet_friendly=pet_friendly, kind=kind, owner=info.context.request.user, category=category,)
-            
+            room = Room.objects.create(
+                name=name,
+                country=country,
+                city=city,
+                price=price,
+                rooms=rooms,
+                toilets=toilets,
+                description=description,
+                address=address,
+                pet_friendly=pet_friendly,
+                kind=kind,
+                owner=info.context.request.user,
+                category=category,
+            )
+
             for amentiy_pk in amenities:
                 amenity = Amenity.objects.get(pk=amentiy_pk)
                 room.amenities.append(amenity)

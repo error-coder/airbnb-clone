@@ -9,12 +9,13 @@ class PerkSerializer(ModelSerializer):
         model = Perk
         fields = "__all__"
 
+
 class ExperienceSerializer(ModelSerializer):
 
     host = TinyUserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     perks = PerkSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Experience
         fields = "__all__"

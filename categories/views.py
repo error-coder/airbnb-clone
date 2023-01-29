@@ -5,4 +5,6 @@ from .serializers import CategorySerializer
 
 class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
-    queryset = Category.objects.filter(kind=Category.CategoryKindChoices.ROOMS,)
+    queryset = Category.objects.filter(
+        kind=Category.CategoryKindChoices.ROOMS,
+    )

@@ -8,12 +8,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from categories.models import Category
 from bookings.models import Booking
-from bookings.serializers import CreateExperienceBookingSerializer, PublicBookingSerializer
+from bookings.serializers import (
+    CreateExperienceBookingSerializer,
+    PublicBookingSerializer,
+)
 from .models import Perk, Experience
 from . import serializers
 
-class Experiences(APIView):
 
+class Experiences(APIView):
     def get(self, request):
         experiences = Experience.objects.all()
         serializer = serializers.ExperienceSerializer(experiences, many=True)
@@ -27,7 +30,7 @@ class Experiences(APIView):
             category_pk = request.data.get("category")
             if not category_pk:
                 raise ParseError("Category is required")
-            
+
             try:
                 category = Category.objects.get(pk=category_pk)
                 if category.kind == Category.CategoryKindChoices.ROOMS:
@@ -53,13 +56,11 @@ class Experiences(APIView):
 
 
 class ExperienceDetail(APIView):
-    
     def get_object(self, pk):
         try:
             return Experience.objects.get(pk=pk)
         except Experience.DoesNotExist:
             raise NotFound
-
 
     def get(self, request, pk):
         experience = self.get_object(pk)
@@ -71,7 +72,9 @@ class ExperienceDetail(APIView):
         if experience.host != request.user:
             raise PermissionDenied
 
-        serializer = serializers.ExperienceSerializer(experience, data=request.data, partial=True)
+        serializer = serializers.ExperienceSerializer(
+            experience, data=request.data, partial=True
+        )
 
         if serializer.is_valid():
             category_pk = request.data.get("category")
@@ -114,8 +117,8 @@ class ExperienceDetail(APIView):
         experience.delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
+
 class ExperiencePerks(APIView):
-    
     def get_object(self, pk):
         try:
             return Experience.objects.get(pk=pk)
@@ -132,11 +135,14 @@ class ExperiencePerks(APIView):
         start = (page - 1) * page_size
         end = start + page_size
         experience = self.get_object(pk)
-        serializer = serializers.PerkSerializer(experience.perks.all()[start:end], many=True,)
+        serializer = serializers.PerkSerializer(
+            experience.perks.all()[start:end],
+            many=True,
+        )
         return Response(serializer.data)
 
-class ExperienceBookings(APIView):
 
+class ExperienceBookings(APIView):
     def get_object(self, pk):
         try:
             return Experience.objects.get(pk=pk)
@@ -154,8 +160,15 @@ class ExperienceBookings(APIView):
         end = start + page_size
         experience = self.get_object(pk)
         now = timezone.localtime(timezone.now()).date()
-        bookings = Booking.objects.filter(experience=experience, kind=Booking.BookingKindChoices.EXPERIENCE, experience_time__gt=now,)[start:end]
-        serializer = PublicBookingSerializer(bookings, many=True,)
+        bookings = Booking.objects.filter(
+            experience=experience,
+            kind=Booking.BookingKindChoices.EXPERIENCE,
+            experience_time__gt=now,
+        )[start:end]
+        serializer = PublicBookingSerializer(
+            bookings,
+            many=True,
+        )
         return Response(serializer.data)
 
     def post(self, request, pk):
@@ -163,7 +176,11 @@ class ExperienceBookings(APIView):
         serializer = CreateExperienceBookingSerializer(data=request.data)
 
         if serializer.is_valid():
-            booking = serializer.save(experience=experience, user=request.user, kind=Booking.BookingKindChoices.EXPERIENCE,)
+            booking = serializer.save(
+                experience=experience,
+                user=request.user,
+                kind=Booking.BookingKindChoices.EXPERIENCE,
+            )
             serializer = PublicBookingSerializer(booking)
             return Response(serializer.data)
         else:
@@ -197,7 +214,9 @@ class ExperienceBookingDetail(APIView):
         if booking.user.pk != request.user.pk:
             raise PermissionDenied
 
-        serializer = CreateExperienceBookingSerializer(booking, data=request.data, partial=True)
+        serializer = CreateExperienceBookingSerializer(
+            booking, data=request.data, partial=True
+        )
 
         if serializer.is_valid():
             booking = serializer.save()
@@ -218,10 +237,7 @@ class ExperienceBookingDetail(APIView):
         return Response(status=HTTP_204_NO_CONTENT)
 
 
-
-
 class Perks(APIView):
-
     def get(self, request):
         all_perks = Perk.objects.all()
         serializer = serializers.PerkSerializer(all_perks, many=True)
@@ -237,13 +253,11 @@ class Perks(APIView):
 
 
 class PerkDetail(APIView):
-
     def get_object(self, pk):
         try:
             return Perk.objects.get(pk=pk)
         except Perk.DoesNotExist:
             raise NotFound
-    
 
     def get(self, request, pk):
         perk = self.get_object(pk)
@@ -252,7 +266,7 @@ class PerkDetail(APIView):
     def put(self, request, pk):
         perk = self.get_object(pk)
         serializer = serializers.PerkSerializer(perk, data=request.data, partial=True)
-        
+
         if serializer.is_valid():
             updated_perk = serializer.save()
             return Response(serializers.PerkSerializer(updated_perk).data)

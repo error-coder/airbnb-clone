@@ -20,7 +20,7 @@ env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(os.path.join(BASE_DIR,".env"))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -37,16 +37,16 @@ ALLOWED_HOSTS = []
 # Application definition
 THIRD_PARTY_APPS = [
     "rest_framework",
-    'rest_framework.authtoken',
+    "rest_framework.authtoken",
     "strawberry.django",
     "corsheaders",
 ]
 
-CUSTOM_APPS = [ 
+CUSTOM_APPS = [
     "common.apps.CommonConfig",
-    "users.apps.UsersConfig", 
+    "users.apps.UsersConfig",
     "rooms.apps.RoomsConfig",
-    "experiences.apps.ExperiencesConfig", 
+    "experiences.apps.ExperiencesConfig",
     "categories.apps.CategoriesConfig",
     "reviews.apps.ReviewsConfig",
     "wishlists.apps.WishlistsConfig",
@@ -75,7 +75,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -144,7 +143,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -155,16 +154,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
 
-MEDIA_ROOT = "uploads" # 파일이 실제 있는 폴더
+MEDIA_ROOT = "uploads"  # 파일이 실제 있는 폴더
 
-MEDIA_URL = "user-uploads/" # 브라우저가 파일을 찾아가는 방법
+MEDIA_URL = "user-uploads/"  # 브라우저가 파일을 찾아가는 방법
 
 PAGE_SIZE = 5
 
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        'rest_framework.authentication.SessionAuthentication', # SessionAuthentication이 쿠키랑 세션을 보고 유저를 찾음
+        "rest_framework.authentication.SessionAuthentication",  # SessionAuthentication이 쿠키랑 세션을 보고 유저를 찾음
         "rest_framework.authentication.TokenAuthentication",
         "config.authentication.JWTAuthentication",
     ]

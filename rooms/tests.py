@@ -5,12 +5,15 @@ from users.models import User
 
 class TestAmenities(APITestCase):
 
-    NAME="Amenity Test"
-    DESC="Amenity Desc"
+    NAME = "Amenity Test"
+    DESC = "Amenity Desc"
     URL = "/api/v3/rooms/amenities/"
 
     def setUp(self) -> None:
-        models.Amenity.objects.create(name=self.NAME, description=self.DESC,)
+        models.Amenity.objects.create(
+            name=self.NAME,
+            description=self.DESC,
+        )
 
     def test_all_amenities(self):
 
@@ -22,23 +25,38 @@ class TestAmenities(APITestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], self.NAME)
         self.assertEqual(data[0]["description"], self.DESC)
-        
 
     def test_create_amenity(self):
 
         new_amenity_name = "New Amenity"
         new_amenity_description = "New Amenity desc."
 
-        response = self.client.post(self.URL, data={"name" : new_amenity_name, "description" : new_amenity_description,},) 
+        response = self.client.post(
+            self.URL,
+            data={
+                "name": new_amenity_name,
+                "description": new_amenity_description,
+            },
+        )
         data = response.json()
 
-        self.assertEqual(response.status_code, 200, "Not 200 status code.",)
-        self.assertEqual(data["name"], new_amenity_name,)
-        self.assertEqual(data["description"], new_amenity_description,)
-        
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Not 200 status code.",
+        )
+        self.assertEqual(
+            data["name"],
+            new_amenity_name,
+        )
+        self.assertEqual(
+            data["description"],
+            new_amenity_description,
+        )
+
         response = self.client.post(self.URL)
         data = response.json()
-        
+
         self.assertEqual(response.status_code, 400)
         self.assertIn("name", data)
 
@@ -49,10 +67,13 @@ class TestAmenity(APITestCase):
     DESC = "Test Dsc"
 
     def setUp(self):
-        models.Amenity.objects.create(name=self.NAME, description=self.DESC,)
+        models.Amenity.objects.create(
+            name=self.NAME,
+            description=self.DESC,
+        )
 
     def test_amenity_not_found(self):
-        response = self.client.get("/api/v3/rooms/amenities/2") 
+        response = self.client.get("/api/v3/rooms/amenities/2")
 
         self.assertEqual(response.status_code, 404)
 
@@ -64,39 +85,56 @@ class TestAmenity(APITestCase):
 
         data = response.json()
 
-        self.assertEqual(data["name"], self.NAME,)
-        self.assertEqual(data["description"], self.DESC,)
+        self.assertEqual(
+            data["name"],
+            self.NAME,
+        )
+        self.assertEqual(
+            data["description"],
+            self.DESC,
+        )
 
     def test_put_amenity(self):
-        
+
         put_amenity_name = "Put Amenity"
         put_amenity_description = "Put Amenity Dsc"
 
-        response = self.client.put("/api/v3/rooms/amenities/1", {"name" : put_amenity_name, "description" : put_amenity_description,},)
+        response = self.client.put(
+            "/api/v3/rooms/amenities/1",
+            {
+                "name": put_amenity_name,
+                "description": put_amenity_description,
+            },
+        )
         data = response.json()
 
         self.assertEqual(response.status_code, 200, "Not 200 Status Code.")
-        self.assertEqual(data["name"], put_amenity_name,)
-        self.assertEqual(data["description"], put_amenity_description,)
-        
+        self.assertEqual(
+            data["name"],
+            put_amenity_name,
+        )
+        self.assertEqual(
+            data["description"],
+            put_amenity_description,
+        )
+
         response = self.client.put("/api/v3/rooms/amenities/1")
         data = response.json()
 
         self.assertIn("name", data)
 
-
     def test_delete_amenity(self):
-        
+
         response = self.client.delete("/api/v3/rooms/amenities/1")
 
         self.assertEqual(response.status_code, 204)
 
 
-
 class TestRooms(APITestCase):
-
     def setUp(self):
-        user = User.objects.create(username="test",)
+        user = User.objects.create(
+            username="test",
+        )
         user.set_password("123")
         user.save()
         self.user = user
@@ -107,6 +145,8 @@ class TestRooms(APITestCase):
 
         self.assertEqual(response.status_code, 403)
 
-        self.client.force_login(self.user,)
+        self.client.force_login(
+            self.user,
+        )
 
         response = self.client.post("/api/v3/rooms/")
