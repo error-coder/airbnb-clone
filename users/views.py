@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.exceptions import ParseError, NotFound
 from rest_framework.permissions import IsAuthenticated
-from .models import User
+from users.models import User
 from . import serializers
 
 
@@ -40,7 +40,7 @@ class Users(APIView):
     def post(self, request):
         password = request.data.get("password")
         if not password:
-            ParseError("Enter the password")
+            raise ParseError
         serializer = serializers.PrivateUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -72,14 +72,14 @@ class ChangePassword(APIView):
         old_password = request.data.get("old_password")
         new_password = request.data.get("new_password")
         if not old_password or not new_password:
-            raise ParseError()
+            raise ParseError
 
         if user.check_password(old_password):
             user.set_password(new_password)
             user.save()
             return Response(status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return ParseError
 
 
 class LogIn(APIView):
@@ -98,9 +98,7 @@ class LogIn(APIView):
             login(request, user)
             return Response({"ok": "Welcome!"})
         else:
-            return Response(
-                {"error": "wrong password"}, status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"error": "wrong password"})
 
 
 class LogOut(APIView):
@@ -128,7 +126,7 @@ class JWTLogin(APIView):
                 {"pk": user.pk},
                 settings.SECRET_KEY,
                 algorithm="HS256",
-            )  # 민감한 정보 X
+            )
             return Response({"token": token})
         else:
             return Response({"error": "wrong password"})
@@ -174,7 +172,8 @@ class GithubLogIn(APIView):
                 user.save()
                 login(request, user)
                 return Response(status=status.HTTP_200_OK)
-        except Exception:
+        except Exception as e:
+            print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -188,7 +187,7 @@ class KakaoLogIn(APIView):
                 data={
                     "grant_type": "authorization_code",
                     "client_id": "00e2d9ca68d4023005c8b0221ad6a6de",
-                    "redirect_url": "http://127.0.0.1:3000/social/kakao",
+                    "redirect_uri": "http://127.0.0.1:3000/social/kakao",
                     "code": code,
                 },
             )

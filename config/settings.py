@@ -143,7 +143,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -158,7 +158,7 @@ MEDIA_ROOT = "uploads"  # 파일이 실제 있는 폴더
 
 MEDIA_URL = "user-uploads/"  # 브라우저가 파일을 찾아가는 방법
 
-PAGE_SIZE = 5
+PAGE_SIZE = 3
 
 
 REST_FRAMEWORK = {
@@ -166,6 +166,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",  # SessionAuthentication이 쿠키랑 세션을 보고 유저를 찾음
         "rest_framework.authentication.TokenAuthentication",
         "config.authentication.JWTAuthentication",
+        "config.authentication.TrustMeBroAuthentication",
     ]
 }
 

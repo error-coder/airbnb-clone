@@ -8,10 +8,10 @@ class ChattingRoom(CommonModel):
 
     users = models.ManyToManyField(
         "users.User",
-        related_name="chat_rooms",
+        related_name="chatting_rooms",
     )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return "Chatting Room."
 
 
@@ -26,12 +26,12 @@ class Message(CommonModel):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="messages",
-    )  # 유저만 삭제되고 보낸 메시지 내용은 삭제도지 않음
+    )
     room = models.ForeignKey(
         "direct_messages.ChattingRoom",
         on_delete=models.CASCADE,
         related_name="messages",
-    )  # 방이 삭제되면 메시지도 같이 삭제됨
+    )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.user} says : {self.text}"

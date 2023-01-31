@@ -17,7 +17,7 @@ class RoomType:
     owner: "UserType"
 
     @strawberry.field
-    def reviews(self, page: int) -> typing.List["ReviewType"]:
+    def reviews(self, page: typing.Optional[int] = 1) -> typing.List["ReviewType"]:
         page_size = settings.PAGE_SIZE
         start = (page - 1) * page_size
         end = start + page_size

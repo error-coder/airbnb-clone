@@ -3,7 +3,7 @@ from .models import Wishlist
 
 
 @admin.register(Wishlist)
-class Wishlist(admin.ModelAdmin):
+class WishlistAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
