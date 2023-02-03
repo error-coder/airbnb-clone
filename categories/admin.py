@@ -7,6 +7,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
+        "pk",
         "kind",
     )
     list_filter = ("kind",)

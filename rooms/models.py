@@ -54,11 +54,11 @@ class Room(CommonModel):
         related_name="rooms",
     )
 
-    def __str__(room) -> str:
-        return room.name
+    def __str__(self):
+        return self.name
 
-    def total_amenities(room):
-        return room.amenities.count()
+    def total_amenities(self):
+        return self.amenities.count()
 
     def rating(room):
         count = room.reviews.count()
@@ -84,8 +84,8 @@ class Amenity(CommonModel):
         blank=True,
     )
 
-    def __str__(amenity) -> str:
-        return amenity.name
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name_plural = "Amenities"

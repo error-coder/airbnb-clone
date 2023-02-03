@@ -4,11 +4,13 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.exceptions import ParseError, NotFound
 from rest_framework.permissions import IsAuthenticated
 from users.models import User
-from . import serializers
+from .serializers import PrivateUserSerializer, TinyUserSerializer, UserSignUpSerializer
+from reviews.serializers import ReviewSerializer
+from reviews.models import Review
 
 
 class Me(APIView):
@@ -17,12 +19,12 @@ class Me(APIView):
 
     def get(self, request):
         user = request.user
-        serializer = serializers.PrivateUserSerializer(user)
+        serializer = PrivateUserSerializer(user)
         return Response(serializer.data)
 
     def put(self, request):
         user = request.user
-        serializer = serializers.PrivateUserSerializer(
+        serializer = PrivateUserSerializer(
             user,
             data=request.data,
             partial=True,
@@ -30,7 +32,7 @@ class Me(APIView):
 
         if serializer.is_valid():
             user = serializer.save()
-            serializer = serializers.PrivateUserSerializer(user)
+            serializer = PrivateUserSerializer(user)
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
@@ -39,18 +41,24 @@ class Me(APIView):
 class Users(APIView):
     def post(self, request):
         password = request.data.get("password")
-        if not password:
-            raise ParseError
-        serializer = serializers.PrivateUserSerializer(data=request.data)
+        password_check = request.data.get("password_check")
+        email = request.data.get("email")
+
+        if User.objects.filter(email=email).exists():
+            return Response(status=HTTP_400_BAD_REQUEST)
+
+        if not password or password != password_check:
+            return Response(status=HTTP_400_BAD_REQUEST)
+
+        serializer = UserSignUpSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(password)
             user.save()
-            login(request, user)
-            serializer = serializers.PrivateUserSerializer(user)
+            serializer = UserSignUpSerializer(user)
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(status=HTTP_400_BAD_REQUEST)
 
 
 class PublicUser(APIView):
@@ -59,7 +67,7 @@ class PublicUser(APIView):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise NotFound
-        serializer = serializers.PrivateUserSerializer(user)
+        serializer = TinyUserSerializer(user)
         return Response(serializer.data)
 
 
@@ -77,7 +85,7 @@ class ChangePassword(APIView):
         if user.check_password(old_password):
             user.set_password(new_password)
             user.save()
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=HTTP_200_OK)
         else:
             return ParseError
 
@@ -96,9 +104,9 @@ class LogIn(APIView):
 
         if user:
             login(request, user)
-            return Response({"ok": "Welcome!"})
+            return Response({"ok": "Welcome!"}, status=HTTP_200_OK)
         else:
-            return Response({"error": "wrong password"})
+            return Response({"error": "wrong password"}, status=HTTP_400_BAD_REQUEST)
 
 
 class LogOut(APIView):
@@ -108,6 +116,19 @@ class LogOut(APIView):
     def post(self, request):
         logout(request)
         return Response({"ok": "bye!"})
+
+
+class PublicUserReviews(APIView):
+    def get(self, request, username):
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound
+        serializer = ReviewSerializer(
+            user.reviews.all(),
+            many=True,
+        )
+        return Response(serializer.data)
 
 
 class JWTLogin(APIView):
@@ -160,7 +181,7 @@ class GithubLogIn(APIView):
             try:
                 user = User.objects.get(email=user_emails[0]["email"])
                 login(request, user)
-                return Response(status=status.HTTP_200_OK)
+                return Response(status=HTTP_200_OK)
             except User.DoesNotExist:
                 user = User.objects.create(
                     username=user_data.get("login"),
@@ -171,10 +192,9 @@ class GithubLogIn(APIView):
                 user.set_unusable_password()
                 user.save()
                 login(request, user)
-                return Response(status=status.HTTP_200_OK)
-        except Exception as e:
-            print(e)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=HTTP_200_OK)
+        except Exception:
+            return Response(status=HTTP_400_BAD_REQUEST)
 
 
 class KakaoLogIn(APIView):
@@ -205,7 +225,7 @@ class KakaoLogIn(APIView):
             try:
                 user = User.objects.get(email=kakao_account.get("email"))
                 login(request, user)
-                return Response(status=status.HTTP_200_OK)
+                return Response(status=HTTP_200_OK)
             except User.DoesNotExist:
                 user = User.objects.create(
                     email=kakao_account.get("email"),
@@ -216,6 +236,6 @@ class KakaoLogIn(APIView):
                 user.set_unusable_password()
                 user.save()
                 login(request, user)
-                return Response(status=status.HTTP_200_OK)
+                return Response(status=HTTP_200_OK)
         except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=HTTP_400_BAD_REQUEST)

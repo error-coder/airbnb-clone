@@ -6,6 +6,7 @@ from .models import Experience, Perk
 class ExperienceAdmin(admin.ModelAdmin):
 
     list_display = (
+        "pk",
         "name",
         "price",
         "start",
@@ -20,6 +21,7 @@ class PerkAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
+        "pk",
         "details",
         "explanation",
     )

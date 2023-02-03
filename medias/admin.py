@@ -4,7 +4,11 @@ from .models import Photo, Video
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "file",
+        "description",
+        "pk",
+    )
 
 
 @admin.register(Video)
