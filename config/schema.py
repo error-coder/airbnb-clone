@@ -8,11 +8,10 @@ class Query(rooms_schema.Query):
 
 
 @strawberry.type
-class Mutation(rooms_schema.Mutation):
+class Mutation:
     pass
 
 
 schema = strawberry.Schema(
     query=Query,
-    # mutation=Mutation,
 )

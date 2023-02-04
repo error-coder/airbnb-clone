@@ -6,7 +6,6 @@ from .models import Booking
 class Booking(admin.ModelAdmin):
 
     list_display = (
-        "pk",
         "kind",
         "user",
         "room",

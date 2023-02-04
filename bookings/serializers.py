@@ -1,8 +1,6 @@
 from django.utils import timezone
 from rest_framework import serializers
 from .models import Booking
-from users.serializers import ManageBookingTinyUserSerializer
-from rooms.serializers import TinyRoomSerializer
 
 
 class CreateRoomBookingSerializer(serializers.ModelSerializer):
@@ -26,7 +24,7 @@ class CreateRoomBookingSerializer(serializers.ModelSerializer):
 
     def validate_check_out(self, value):
         now = timezone.localtime(timezone.now()).date()
-        if now >= value:
+        if now > value:
             raise serializers.ValidationError("Can't book in the past!")
         return value
 
@@ -47,33 +45,6 @@ class CreateRoomBookingSerializer(serializers.ModelSerializer):
         return data
 
 
-class CreateExperienceBookingSerializer(serializers.ModelSerializer):
-
-    experience_time = serializers.DateTimeField()
-
-    class Meta:
-        model = Booking
-        fields = (
-            "experience_time",
-            "guests",
-        )
-
-    def validate_experience_time(self, value):
-        now = timezone.localtime(timezone.now())
-        if now > value:
-            raise serializers.ValidationError("Can't book in the past!")
-        return value
-
-    def validate(self, data):
-        if Booking.objects.filter(
-            experience_date=data["experience_date"],
-        ).exists():
-            raise serializers.ValidationError(
-                "Those (or some) of those dates are already taken."
-            )
-        return data
-
-
 class PublicBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
@@ -83,39 +54,4 @@ class PublicBookingSerializer(serializers.ModelSerializer):
             "check_out",
             "experience_time",
             "guests",
-        )
-
-
-class CheckMyBookingSerializer(serializers.ModelSerializer):
-
-    room = TinyRoomSerializer()
-
-    class Meta:
-        model = Booking
-        fields = (
-            "id",
-            "room",
-            "kind",
-            "check_in",
-            "check_out",
-            "guests",
-            "not_canceled",
-        )
-
-
-class ManageBookingsSerializer(serializers.ModelSerializer):
-
-    room = TinyRoomSerializer()
-    user = ManageBookingTinyUserSerializer()
-
-    class Meta:
-        model = Booking
-        fields = (
-            "id",
-            "room",
-            "check_in",
-            "check_out",
-            "guests",
-            "not_canceled",
-            "user",
         )

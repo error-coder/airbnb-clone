@@ -16,7 +16,6 @@ class RoomAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
-        "pk",
         "price",
         "kind",
         "total_amenities",
@@ -34,7 +33,11 @@ class RoomAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     )
-    search_fields = ("^owner__username",)
+    search_fields = (
+        "name",
+        "^price",
+        "=owner__username",
+    )
 
 
 @admin.register(Amenity)
@@ -42,7 +45,6 @@ class AmenityAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
-        "pk",
         "description",
         "created_at",
         "updated_at",

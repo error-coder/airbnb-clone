@@ -12,22 +12,6 @@ class TinyUserSerializer(ModelSerializer):
         )
 
 
-class ManageBookingTinyUserSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("name",)
-
-
-class UserSignUpSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "name",
-            "email",
-            "username",
-        )
-
-
 class PrivateUserSerializer(ModelSerializer):
     class Meta:
         model = User

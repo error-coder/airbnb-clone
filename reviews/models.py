@@ -8,9 +8,7 @@ class Review(CommonModel):
 
     user = models.ForeignKey(
         "users.User",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="reviews",
     )
     room = models.ForeignKey(
@@ -31,4 +29,4 @@ class Review(CommonModel):
     rating = models.PositiveIntegerField()
 
     def __str__(self) -> str:
-        return f"{self.user} / {self.rating}"
+        return f"{self.user} / {self.rating}⭐️"

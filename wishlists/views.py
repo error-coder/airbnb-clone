@@ -57,7 +57,7 @@ class WishlistDetail(APIView):
         return Response(status=HTTP_200_OK)
 
     def put(self, request, pk):
-        wishlist = self.get_object(pk, user=request.user)
+        wishlist = self.get_object(pk, request.user)
         serializer = WishlistSerializer(
             wishlist,
             data=request.data,
@@ -94,5 +94,4 @@ class WishlistToggle(APIView):
             wishlist.rooms.remove(room)
         else:
             wishlist.rooms.add(room)
-
         return Response(status=HTTP_200_OK)

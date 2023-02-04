@@ -23,26 +23,6 @@ class WordFilter(admin.SimpleListFilter):
             reviews
 
 
-class ReviewEvaluationFilter(admin.SimpleListFilter):
-
-    title = "Filter good and bad reviews."
-
-    parameter_name = "evaluation_status"
-
-    def lookups(self, request, model_admin):
-        return [("good", "Good"), ("bad", "Bad")]
-
-    def queryset(self, request, reviews):
-        status = self.value()
-        if status:
-            if status == "good":
-                return reviews.filter(rating__gte=3)
-            else:
-                return reviews.filter(rating__lt=3)
-        else:
-            return reviews
-
-
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
 
@@ -51,7 +31,6 @@ class ReviewAdmin(admin.ModelAdmin):
         "payload",
     )
     list_filter = (
-        ReviewEvaluationFilter,
         WordFilter,
         "rating",
         "user__is_host",

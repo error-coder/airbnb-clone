@@ -1,3 +1,4 @@
+from multiprocessing import AuthenticationError
 import jwt
 from django.conf import settings
 from rest_framework.authentication import BaseAuthentication
