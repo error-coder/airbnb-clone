@@ -23,7 +23,7 @@ class Photo(CommonModel):
         related_name="photos",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Photo File"
 
 
@@ -33,8 +33,8 @@ class Video(CommonModel):
     experience = models.OneToOneField(
         "experiences.Experience",
         on_delete=models.CASCADE,
-        related_name="videos",
+        related_name="video",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Video File"
