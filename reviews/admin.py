@@ -3,7 +3,9 @@ from .models import Review
 
 
 class WordFilter(admin.SimpleListFilter):
+
     title = "Filter by words!"
+
     parameter_name = "word"
 
     def lookups(self, request, model_admin):
@@ -18,11 +20,12 @@ class WordFilter(admin.SimpleListFilter):
         if word:
             return reviews.filter(payload__contains=word)
         else:
-            return reviews
+            reviews
 
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
+
     list_display = (
         "__str__",
         "payload",
@@ -34,9 +37,3 @@ class ReviewAdmin(admin.ModelAdmin):
         "room__category",
         "room__pet_friendly",
     )
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(ReviewAdmin, self).get_form(request, obj, **kwargs)
-
-        form.base_fields["user"].initial = request.user
-        return form

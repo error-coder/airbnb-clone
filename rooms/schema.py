@@ -1,6 +1,7 @@
 import strawberry
 import typing
-from . import types, queries, mutations
+from . import types
+from . import queries
 from common.permissions import OnlyLoggedIn
 
 
@@ -17,7 +18,4 @@ class Query:
 
 @strawberry.type
 class Mutation:
-    post_room: typing.Optional[types.RoomType] = strawberry.mutation(
-        resolver=mutations.post_room,
-        permission_classes=[OnlyLoggedIn],
-    )
+    pass

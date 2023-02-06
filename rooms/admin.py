@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import Room, Amenity
-from categories.models import Category
 
 
 @admin.action(description="Set all prices to zero")
@@ -12,6 +11,7 @@ def reset_prices(model_admin, request, rooms):
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
+
     actions = (reset_prices,)
 
     list_display = (
@@ -32,20 +32,12 @@ class RoomAdmin(admin.ModelAdmin):
         "amenities",
         "created_at",
         "updated_at",
-        "category",
     )
-
-    search_fields = ("owner__username",)
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(RoomAdmin, self).get_form(request, obj, **kwargs)
-
-        form.base_fields["category"].queryset = Category.objects.filter(kind="rooms")
-        form.base_fields["owner"].initial = request.user
-        return form
-
-    def total_amenities(self, room):
-        return room.amenities.count()
+    search_fields = (
+        "name",
+        "^price",
+        "=owner__username",
+    )
 
 
 @admin.register(Amenity)
@@ -57,7 +49,6 @@ class AmenityAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     )
-
     readonly_fields = (
         "created_at",
         "updated_at",

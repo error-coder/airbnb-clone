@@ -4,7 +4,6 @@ from .models import ChattingRoom, Message
 
 @admin.register(ChattingRoom)
 class ChattingRoomAdmin(admin.ModelAdmin):
-
     list_display = (
         "__str__",
         "created_at",

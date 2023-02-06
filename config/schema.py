@@ -14,5 +14,5 @@ class Mutation(rooms_schema.Mutation):
 
 schema = strawberry.Schema(
     query=Query,
-    mutation=Mutation,
+    # mutation=Mutation,
 )

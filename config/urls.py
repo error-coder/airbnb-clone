@@ -16,25 +16,18 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
 from django.conf.urls.static import static
-from rooms import urls as roomsUrls
-from categories import urls as categoriesUrls
-from experiences import urls as experiencesUrls
-from medias import urls as mediasUrls
-from wishlists import urls as wishlistsUrls
-from users import urls as usersUrls
+from django.conf import settings
 from strawberry.django.views import GraphQLView
 from .schema import schema
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v3/categories/", include(categoriesUrls)),
-    path("api/v3/experiences/", include(experiencesUrls)),
-    path("api/v3/medias/", include(mediasUrls)),
-    path("api/v3/rooms/", include(roomsUrls)),
-    path("api/v3/wishlists/", include(wishlistsUrls)),
-    path("api/v3/users/", include(usersUrls)),
+    path("api/v3/rooms/", include("rooms.urls")),
+    path("api/v3/categories/", include("categories.urls")),
+    path("api/v3/experiences/", include("experiences.urls")),
+    path("api/v3/medias/", include("medias.urls")),
+    path("api/v3/wishlists/", include("wishlists.urls")),
+    path("api/v3/users/", include("users.urls")),
     path("graphql", GraphQLView.as_view(schema=schema)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

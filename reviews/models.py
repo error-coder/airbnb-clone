@@ -1,27 +1,25 @@
 from django.db import models
 from common.models import CommonModel
-from users.models import User
-from rooms.models import Room
-from experiences.models import Experience
 
 
 class Review(CommonModel):
+
     """Review from a User to a Room or Experience"""
 
     user = models.ForeignKey(
-        User,
+        "users.User",
         on_delete=models.CASCADE,
         related_name="reviews",
     )
     room = models.ForeignKey(
-        Room,
+        "rooms.Room",
         null=True,
         blank=True,
         on_delete=models.CASCADE,
         related_name="reviews",
     )
     experience = models.ForeignKey(
-        Experience,
+        "experiences.Experience",
         null=True,
         blank=True,
         on_delete=models.CASCADE,

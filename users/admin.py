@@ -4,7 +4,7 @@ from .models import User
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):    
+class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (
             "Profile",
