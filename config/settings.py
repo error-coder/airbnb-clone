@@ -32,7 +32,7 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -44,9 +44,9 @@ THIRD_PARTY_APPS = [
 ]
 
 CUSTOM_APPS = [
-    "common.apps.CommonConfig",
     "users.apps.UsersConfig",
     "rooms.apps.RoomsConfig",
+    "common.apps.CommonConfig",
     "experiences.apps.ExperiencesConfig",
     "categories.apps.CategoriesConfig",
     "reviews.apps.ReviewsConfig",
@@ -160,12 +160,13 @@ MEDIA_ROOT = "uploads"  # 파일이 실제 있는 폴더
 
 MEDIA_URL = "user-uploads/"  # 브라우저가 파일을 찾아가는 방법
 
-PAGE_SIZE = 3
+PAGE_SIZE = 5
 
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",  # SessionAuthentication이 쿠키랑 세션을 보고 유저를 찾음
+        "config.authentication.TrustMeBroAuthentication",
         "rest_framework.authentication.TokenAuthentication",
         "config.authentication.JWTAuthentication",
     ]

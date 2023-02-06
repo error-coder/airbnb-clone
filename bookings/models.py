@@ -7,9 +7,8 @@ class Booking(CommonModel):
     """Booking Model Definition"""
 
     class BookingKindChoices(models.TextChoices):
-
         ROOM = "room", "Room"
-        EXPERIENCE = "experience", "Experience"
+        EXPERIENCE = "experience", "Experince"
 
     kind = models.CharField(
         max_length=15,
@@ -48,5 +47,9 @@ class Booking(CommonModel):
     )
     guests = models.PositiveIntegerField()
 
+    not_canceled = models.BooleanField(
+        default=True,
+    )
+
     def __str__(self) -> str:
-        return f"{self.kind.title()} booking for : {self.user}"
+        return f"{self.kind.title()} booking for: {self.user}"

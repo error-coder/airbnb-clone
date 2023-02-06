@@ -1,29 +1,50 @@
 import jwt
 import requests
-from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
 from rest_framework.exceptions import ParseError, NotFound
 from rest_framework.permissions import IsAuthenticated
-from . import serializers
 from .models import User
+from .serializers import PrivateUserSerializer, PublicUserSerializer
+
+
+class Users(APIView):
+    def post(self, request):
+        password = request.data.get("password")
+        if not password:
+            raise ParseError()
+
+        serializer = PrivateUserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+            user.set_password(password)
+            user.save()
+            serializer = PrivateUserSerializer(user)
+            return Response(serializer.data)
+
+        else:
+            print(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class Me(APIView):
-
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        serializer = serializers.PrivateUserSerializer(user)
-
+        serializer = PrivateUserSerializer(user)
         return Response(serializer.data)
 
     def put(self, request):
         user = request.user
-        serializer = serializers.PrivateUserSerializer(
+        serializer = PrivateUserSerializer(
             user,
             data=request.data,
             partial=True,
@@ -31,46 +52,13 @@ class Me(APIView):
 
         if serializer.is_valid():
             user = serializer.save()
-            serializer = serializers.PrivateUserSerializer(user)
+            serializer = PrivateUserSerializer(user)
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
-
-
-class Users(APIView):
-    def post(self, request):
-        password = request.data.get("password")
-        if not password:
-            ParseError("비밀번호를 입력하세요")
-
-        serializer = serializers.PrivateUserSerializer(data=request.data)
-
-        if serializer.is_valid():
-            user = serializer.save()
-            user.set_password(password)
-            user.save()
-
-            login(request, user)
-
-            serializer = serializers.PrivateUserSerializer(user)
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors)
-
-
-class PublicUser(APIView):
-    def get(self, request, username):
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise NotFound
-        serializer = serializers.PrivateUserSerializer(user)
-
-        return Response(serializer.data)
 
 
 class ChangePassword(APIView):
-
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
@@ -79,14 +67,15 @@ class ChangePassword(APIView):
         new_password = request.data.get("new_password")
 
         if not old_password or not new_password:
-            raise ParseError()
+            return ParseError
 
         if user.check_password(old_password):
             user.set_password(new_password)
             user.save()
             return Response(status=status.HTTP_200_OK)
+
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return ParseError
 
 
 class LogIn(APIView):
@@ -107,18 +96,132 @@ class LogIn(APIView):
             login(request, user)
             return Response({"ok": "Welcome!"})
         else:
-            return Response(
-                {"error": "wrong password"}, status=status.HTTP_403_FORBIDDEN
+            return ParseError("wrong password")
+
+
+class GithubLogIn(APIView):
+    def post(self, request):
+        try:
+            code = request.data.get("code")
+
+            access_token = requests.post(
+                f"https://github.com/login/oauth/access_token?code={code}&client_id={settings.GITHUB_ID}&client_secret={settings.GITHUB_SECRET}",
+                headers={
+                    "Accept": "application/json",
+                },
             )
+            access_token = access_token.json().get("access_token")
+
+            user_data = requests.get(
+                "https://api.github.com/user",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+            )
+            user_data = user_data.json()
+
+            user_emails = requests.get(
+                "https://api.github.com/user/emails",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+            )
+            user_emails = user_emails.json()
+
+            try:
+                user = User.objects.get(email=user_emails[0]["email"])
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+
+            except User.DoesNotExist:
+
+                user = User.objects.create(
+                    username=user_data.get("login"),
+                    email=user_emails[0]["email"],
+                    name=user_data.get("name") or "",
+                    avatar=user_data.get("avatar_url"),
+                )
+                user.set_unusable_password()
+                user.save()
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class LogOut(APIView):
+class KakaoLogIn(APIView):
+    def post(self, request):
+        try:
+            code = request.data.get("code")
 
+            access_token = requests.post(
+                f"https://kauth.kakao.com/oauth/token",
+                headers={
+                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8"
+                },
+                data={
+                    "grant_type": "authorization_code",
+                    "client_id": settings.KAKAO_ID,
+                    "redirect_uri": settings.KAKAO_REDIRECT_URL,
+                    "code": code,
+                },
+            )
+            access_token = access_token.json().get("access_token")
+
+            user_data = requests.get(
+                f"https://kapi.kakao.com/v2/user/me",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+                },
+            )
+            user_data = user_data.json()
+            kakao_acount = user_data.get("kakao_account")
+            profile = kakao_acount.get("profile")
+
+            try:
+                user = User.objects.get(email=kakao_acount.get("email"))
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+
+            except User.DoesNotExist:
+
+                user = User.objects.create(
+                    username=profile.get("nickname"),
+                    email=kakao_acount.get("email"),
+                    name=profile.get("nickname"),
+                    avatar=profile.get("profile_image_url"),
+                )
+                user.set_unusable_password()
+                user.save()
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class Logout(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         logout(request)
         return Response({"ok": "bye!"})
+
+
+class PublicUser(APIView):
+    def get(self, request, username):
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound
+        serializer = PublicUserSerializer(
+            user,
+            context={"request": request},
+        )
+        return Response(serializer.data)
 
 
 class JWTLogIn(APIView):
@@ -128,7 +231,6 @@ class JWTLogIn(APIView):
 
         if not username or not password:
             raise ParseError
-
         user = authenticate(
             request,
             username=username,
@@ -141,119 +243,7 @@ class JWTLogIn(APIView):
                 settings.SECRET_KEY,
                 algorithm="HS256",
             )
-
             return Response({"token": token})
+
         else:
-            return Response({"error": "wrong password"})
-
-
-class GithubLogIn(APIView):
-    def post(self, request):
-        try:
-            code = request.data.get("code")
-
-            access_token = requests.post(
-                f"https://github.com/login/oauth/access_token?code={code}&client_id=7295d1136e095e687640&client_secret={settings.GH_SECRET}",
-                headers={"Accept": "application/json"},
-            )
-
-            access_token = access_token.json().get("access_token")
-
-            user_data = requests.get(
-                "https://api.github.com/user",
-                headers={
-                    "Authorization": f"Bearer {access_token}",
-                    "Accept": "application/json",
-                },
-            )
-
-            user_data = user_data.json()
-
-            user_emails = requests.get(
-                "https://api.github.com/user/emails",
-                headers={
-                    "Authorization": f"Bearer {access_token}",
-                    "Accept": "application/json",
-                },
-            )
-
-            user_emails = user_emails.json()
-
-            try:
-                user = User.objects.get(email=user_emails[0]["email"])
-
-                login(request, user)
-
-                return Response(status=status.HTTP_200_OK)
-
-            except User.DoesNotExist:
-                user = User.objects.create(
-                    username=user_data.get("login"),
-                    email=user_emails[0]["email"],
-                    name=user_data.get("name"),
-                    avatar=user_data.get("avatar_url"),
-                )
-                user.set_unusable_password()
-                user.save()
-
-                login(request, user)
-
-                return Response(status=status.HTTP_200_OK)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class KakaoLogIn(APIView):
-    def post(self, request):
-        try:
-            code = request.data.get("code")
-            access_token = requests.post(
-                "https://kauth.kakao.com/oauth/token",
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
-                data={
-                    "grant_type": "authorization_code",
-                    "client_id": "00e2d9ca68d4023005c8b0221ad6a6de",
-                    "redirect_uri": "http://127.0.0.1:3000/social/kakao",
-                    "code": code,
-                },
-            )
-
-            access_token = access_token.json().get("access_token")
-
-            user_data = requests.get(
-                "https://kapi.kakao.com/v2/user/me",
-                headers={
-                    "Authorization": f"Bearer {access_token}",
-                    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-                },
-            )
-
-            user_data = user_data.json()
-
-            kakao_account = user_data.get("kakao_account")
-            profile = kakao_account.get("profile")
-
-            try:
-                user = User.objects.get(email=kakao_account.get("email"))
-
-                login(request, user)
-
-                return Response(status=status.HTTP_200_OK)
-
-            except User.DoesNotExist:
-
-                user = User.objects.create(
-                    email=kakao_account.get("email"),
-                    username=profile.get("nickname"),
-                    name=profile.get("nickname"),
-                    avatar=profile.get("profile_image_url"),
-                )
-                user.set_unusable_password()
-                user.save()
-
-                login(request, user)
-
-                return Response(status=status.HTTP_200_OK)
-
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return ParseError("wrong password")

@@ -3,10 +3,10 @@ from .models import Booking
 
 
 @admin.register(Booking)
-class Booking(admin.ModelAdmin):
-
+class BookingAdmin(admin.ModelAdmin):
     list_display = (
         "kind",
+        "pk",
         "user",
         "room",
         "experience",

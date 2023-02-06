@@ -1,5 +1,8 @@
 from django.db import models
 from common.models import CommonModel
+from rooms.models import Room
+from experiences.models import Experience
+from users.models import User
 
 
 class Wishlist(CommonModel):
@@ -10,15 +13,13 @@ class Wishlist(CommonModel):
         max_length=150,
     )
     rooms = models.ManyToManyField(
-        "rooms.Room",
-        related_name="wishlists",
+        Room,
     )
     experiences = models.ManyToManyField(
-        "experiences.Experience",
-        related_name="wishlists",
+        Experience,
     )
     user = models.ForeignKey(
-        "users.User",
+        User,
         on_delete=models.CASCADE,
         related_name="wishlists",
     )

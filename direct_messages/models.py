@@ -11,7 +11,7 @@ class ChattingRoom(CommonModel):
         related_name="chatting_rooms",
     )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return "Chatting Room."
 
 
@@ -33,5 +33,5 @@ class Message(CommonModel):
         related_name="messages",
     )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.user} says : {self.text}"

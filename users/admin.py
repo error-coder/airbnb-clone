@@ -4,7 +4,7 @@ from .models import User
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin):    
     fieldsets = (
         (
             "Profile",
@@ -40,6 +40,7 @@ class CustomUserAdmin(UserAdmin):
             "Important Dates",
             {
                 "fields": ("last_login", "date_joined"),
+                "classes": ("collapse",),
             },
         ),
     )
