@@ -32,7 +32,7 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -44,9 +44,9 @@ THIRD_PARTY_APPS = [
 ]
 
 CUSTOM_APPS = [
+    "common.apps.CommonConfig",
     "users.apps.UsersConfig",
     "rooms.apps.RoomsConfig",
-    "common.apps.CommonConfig",
     "experiences.apps.ExperiencesConfig",
     "categories.apps.CategoriesConfig",
     "reviews.apps.ReviewsConfig",
@@ -166,14 +166,13 @@ PAGE_SIZE = 3
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",  # SessionAuthentication이 쿠키랑 세션을 보고 유저를 찾음
-        "config.authentication.TrustMeBroAuthentication",
         "rest_framework.authentication.TokenAuthentication",
         "config.authentication.JWTAuthentication",
     ]
 }
-
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
+if DEBUG:
+    CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]
+    CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
 
 CORS_ALLOW_CREDENTIALS = True
 

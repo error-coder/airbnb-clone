@@ -4,7 +4,7 @@ from common.models import CommonModel
 
 class Review(CommonModel):
 
-    """Review from a User to a Room or Experience"""
+    """Review from User to a Room or Experience"""
 
     user = models.ForeignKey(
         "users.User",
@@ -20,8 +20,8 @@ class Review(CommonModel):
     )
     experience = models.ForeignKey(
         "experiences.Experience",
-        null=True,
         blank=True,
+        null=True,
         on_delete=models.CASCADE,
         related_name="reviews",
     )
@@ -29,4 +29,4 @@ class Review(CommonModel):
     rating = models.PositiveIntegerField()
 
     def __str__(self) -> str:
-        return f"{self.user} / {self.rating}⭐️"
+        return f"{self.user} / {self.rating} ⭐️"

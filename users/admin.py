@@ -7,7 +7,7 @@ from .models import User
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (
-            "Profile",
+            ("Profile"),
             {
                 "fields": (
                     "avatar",
@@ -20,11 +20,10 @@ class CustomUserAdmin(UserAdmin):
                     "language",
                     "currency",
                 ),
-                "classes": ("wide",),
             },
         ),
         (
-            "Permissions",
+            ("Permissions"),
             {
                 "fields": (
                     "is_active",
@@ -36,13 +35,7 @@ class CustomUserAdmin(UserAdmin):
                 "classes": ("collapse",),
             },
         ),
-        (
-            "Important Dates",
-            {
-                "fields": ("last_login", "date_joined"),
-                "classes": ("collapse",),
-            },
-        ),
+        (("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
 
     list_display = ("username", "email", "name", "is_host")

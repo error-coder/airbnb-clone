@@ -8,11 +8,11 @@ class ChattingRoom(CommonModel):
 
     users = models.ManyToManyField(
         "users.User",
-        related_name="chatting_rooms",
+        related_name="chat_rooms",
     )
 
-    def __str__(self):
-        return "Chatting Room."
+    def __str__(self) -> str:
+        return "Chatting Room"
 
 
 class Message(CommonModel):
@@ -33,5 +33,5 @@ class Message(CommonModel):
         related_name="messages",
     )
 
-    def __str__(self):
-        return f"{self.user} says : {self.text}"
+    def __str__(self) -> str:
+        return f"{self.user} says: {self.text}"
