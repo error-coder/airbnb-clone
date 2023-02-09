@@ -8,10 +8,7 @@ from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from categories.models import Category
 from bookings.models import Booking
-from bookings.serializers import (
-    CreateExperienceBookingSerializer,
-    PublicBookingSerializer,
-)
+from bookings.serializers import CreateExperienceBookingSerializer, PublicBookingSerializer
 from .models import Perk, Experience
 from . import serializers
 
@@ -72,9 +69,7 @@ class ExperienceDetail(APIView):
         if experience.host != request.user:
             raise PermissionDenied
 
-        serializer = serializers.ExperienceSerializer(
-            experience, data=request.data, partial=True
-        )
+        serializer = serializers.ExperienceSerializer(experience, data=request.data, partial=True)
 
         if serializer.is_valid():
             category_pk = request.data.get("category")
@@ -212,9 +207,7 @@ class ExperienceBookingDetail(APIView):
         if booking.user.pk != request.user.pk:
             raise PermissionDenied
 
-        serializer = CreateExperienceBookingSerializer(
-            booking, data=request.data, partial=True
-        )
+        serializer = CreateExperienceBookingSerializer(booking, data=request.data, partial=True)
 
         if serializer.is_valid():
             booking = serializer.save()
