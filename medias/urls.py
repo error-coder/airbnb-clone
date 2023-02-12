@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PhotoDetail, GetUploadURL
+from .views import GetUploadURL, PhotoDetail
 
 urlpatterns = [
     path("photos/get-url", GetUploadURL.as_view()),

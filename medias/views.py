@@ -36,9 +36,11 @@ class GetUploadURL(APIView):
         url = f"https://api.cloudflare.com/client/v4/accounts/{settings.CF_ID}/images/v2/direct_upload"
         one_time_url = requests.post(
             url,
-            headers={"Authorization": f"Bearer {settings.CF_TOKEN}"},
+            headers={
+                "Authorization": f"Bearer {settings.CF_TOKEN}",
+            },
         )
         one_time_url = one_time_url.json()
+        print("\n", one_time_url, "\n")
         result = one_time_url.get("result")
-
         return Response({"id": result.get("id"), "uploadURL": result.get("uploadURL")})
