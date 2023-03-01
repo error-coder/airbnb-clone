@@ -9,7 +9,7 @@ class Room(CommonModel):
     class RoomKindChoices(models.TextChoices):
         ENTIRE_PLACE = ("entire_place", "Entire Place")
         PRIVATE_ROOM = ("private_room", "Private Room")
-        SHARED_ROOM = ("shared_room", "Shared Room")
+        SHARED_ROOM = "shared_room", "Shared Room"
 
     name = models.CharField(
         max_length=180,
@@ -63,17 +63,17 @@ class Room(CommonModel):
     def rating(room):
         count = room.reviews.count()
         if count == 0:
-            return count
+            return 0
         else:
             total_rating = 0
             for review in room.reviews.all().values("rating"):
                 total_rating += review["rating"]
-            return round(total_rating / count, 1)
+            return round(total_rating / count, 2)
 
 
 class Amenity(CommonModel):
 
-    """Amenity Model Definition"""
+    """Amenity Definiton"""
 
     name = models.CharField(
         max_length=150,
@@ -84,8 +84,8 @@ class Amenity(CommonModel):
         blank=True,
     )
 
-    def __str__(amenity) -> str:
-        return amenity.name
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         verbose_name_plural = "Amenities"

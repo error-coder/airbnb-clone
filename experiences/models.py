@@ -4,7 +4,7 @@ from common.models import CommonModel
 
 class Experience(CommonModel):
 
-    """Experience Model Definition"""
+    """Experience Model Definiiton"""
 
     country = models.CharField(
         max_length=50,
@@ -17,7 +17,6 @@ class Experience(CommonModel):
     name = models.CharField(
         max_length=250,
     )
-    description = models.TextField()
     host = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE,
@@ -29,6 +28,7 @@ class Experience(CommonModel):
     )
     start = models.TimeField()
     end = models.TimeField()
+    description = models.TextField()
     perks = models.ManyToManyField(
         "experiences.Perk",
         related_name="experiences",

@@ -25,7 +25,7 @@ class RoomListSerializer(ModelSerializer):
     class Meta:
         model = Room
         fields = (
-            "id",
+            "pk",
             "name",
             "country",
             "city",
@@ -39,15 +39,17 @@ class RoomListSerializer(ModelSerializer):
         return room.rating()
 
     def get_is_owner(self, room):
-        request = self.context.get("request")
-        if request:
-            return room.owner == request.user
-        return False
+        request = self.context["request"]
+        return room.owner == request.user
 
 
 class RoomDetailSerializer(ModelSerializer):
 
     owner = TinyUserSerializer(read_only=True)
+    amentieis = AmenitySerializer(
+        read_only=True,
+        many=True,
+    )
     category = CategorySerializer(
         read_only=True,
     )
@@ -58,7 +60,7 @@ class RoomDetailSerializer(ModelSerializer):
 
     class Meta:
         model = Room
-        exclude = ("amenities",)
+        exclude = "__all__"
 
     def get_rating(self, room):
         return room.rating()
@@ -73,7 +75,5 @@ class RoomDetailSerializer(ModelSerializer):
         request = self.context.get("request")
         if request:
             if request.user.is_authenticated:
-                return Wishlist.objects.filter(
-                    user=request.user, rooms__pk=room.pk
-                ).exists()
+                return Wishlist.objects.filter(user=request.user, rooms__pk=room.pk).exists()
         return False
