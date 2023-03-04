@@ -78,5 +78,7 @@ class RoomDetailSerializer(ModelSerializer):
         request = self.context.get("request")
         if request:
             if request.user.is_authenticated:
-                return Wishlist.objects.filter(user=request.user, rooms__pk=room.pk).exists()
+                return Wishlist.objects.filter(
+                    user=request.user, rooms__pk=room.pk
+                ).exists()
         return False
